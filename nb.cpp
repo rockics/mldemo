@@ -1,18 +1,9 @@
-/***************************************************************************
- * 
- * Copyright (c) 2014 Baidu.com, Inc. All Rights Reserved
- * $Id$ 
- * 
- **************************************************************************/
- 
- 
- 
 /**
- * @file train.cpp
- * @author shirenxie01(shirenxie01@baidu.com)
+ * @file nv.cpp
+ * @author rockics
  * @date 2014/04/12 13:38:40
  * @version $Revision$ 
- * @brief 
+ * @brief nb算法
  *  
  **/
 #include <iostream>
@@ -32,7 +23,7 @@ int main()
     //read file get word vector
     DIR *dp;
     struct dirent *dirp;
-    string dirname = "/home/rockics/machine_learning/peileyuan/class01/data01/";
+    string dirname = "/home/rockics/machine_learning/demo/01/data01/";
     vector<string> filename_list;
     vector<string> filename_list_test;
     vector<string> type_list;
