@@ -51,7 +51,7 @@ int main()
     }
 
     vector<string>::iterator path;
-    map<string,double>::iterator map_it, map_end;
+    map<string,double>::iterator map_it;
     std::string::size_type pos0,pos1;
     cout << "共有"<<filename_list.size() + filename_list_test.size()<< "个文件"<<endl;
     cout << "其中训练样本"<<filename_list.size()<< "个文件"<<endl;
@@ -169,6 +169,9 @@ int main()
     //预测
     int all_test = 0;
     int all_true = 0;
+    map<string, int> fact;
+    map<string, int> predict;
+    map<string, int> right;
     for (path = filename_list_test.begin(); path != filename_list_test.end(); path++){
         all_test ++;
         string mypath = *path;
@@ -177,10 +180,8 @@ int main()
         pos1 = type.find('.');
         type = mypath.substr(pos0+7, pos1);
         string::iterator t = type.begin();
-        while(t != type.end())
-        {
-            if(*t >= '0' && *t <= '9')
-            {
+        while(t != type.end()){
+            if(*t >= '0' && *t <= '9'){
                 type.erase(t);
             }else {
                 t++;
@@ -189,12 +190,11 @@ int main()
         //分别计算X属于每个类别的概率
         //cal begin
         string mytype = "unknow";
+        double max_value = -10000000; 
         map<string, double> type_map;
         for (map_it = type_p.begin(); map_it != type_p.end(); map_it++){
             //开始计算之前都要初始化
-            mytype = "unknow";
             double log_value = 0; 
-            double max_value = -10000000; 
             //read file count word 
             ifstream infile(mypath.c_str());
             if(!infile){
@@ -218,6 +218,7 @@ int main()
                             log_value += log(type_default_p[map_it->first]);
                         } else{
                             log_value += log(word_it->second);
+                            //log_value = 10;
                         }
                     }
                 }
@@ -235,8 +236,27 @@ int main()
             infile.clear();
             //cal end
         }
+        map<string, int>::iterator a1,b1,c1;
         if (mytype == type) {
             all_true ++;
+            c1 = right.find(mytype);
+            if (c1 == right.end()) {
+                right.insert(make_pair(mytype,1));
+            } else {
+                c1->second++;
+            }
+        }
+        a1 = fact.find(type);
+        if (a1 == fact.end()) {
+            fact.insert(make_pair(type,1));
+        } else {
+            a1->second++;
+        }
+        b1 = predict.find(mytype);
+        if (b1 == predict.end()) {
+            predict.insert(make_pair(mytype,1));
+        } else {
+            b1->second++;
         }
         /*
         cout <<"-----------------------begin------------------------" << endl;
@@ -248,13 +268,20 @@ int main()
         }
         cout <<"-----------------------end------------------------" << endl;
         */
+        //break;
     }
 
 
     double accuracy = (double)all_true/all_test;
-    cout << "All test:" << all_test << endl;
-    cout << "All true:" << all_true << endl;
-    cout << "Accuracy:" << accuracy << endl;
+    //cout << "All test:" << all_test << endl;
+    //cout << "All true:" << all_true << endl;
+    cout << "准确率Accuracy:" << accuracy << endl;
+    cout << "类别\t精准率\t召回率" << endl;
+    for (map_it = type_p.begin(); map_it != type_p.end(); map_it++){
+        double precision = (double)right[map_it->first]/predict[map_it->first];
+        double recall = (double)right[map_it->first]/fact[map_it->first];
+        cout << map_it->first << ":\t" << precision << "\t" << recall << endl;
+    }
     return 0;
 
 }
